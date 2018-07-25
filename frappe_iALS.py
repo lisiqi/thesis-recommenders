@@ -26,51 +26,24 @@ from measure import ERR
 
 import matplotlib.pyplot as plt
 
-# train_file = "train_rel_cold_0.5.csv"
-# test_file = "test_warm.csv"
-
-# train_file = "train80_3.csv"
-# test_file = "test20_3.csv"
-
-
 def read_data(filename):
     """ Reads in the frappe dataset, and returns a tuple of a pandas dataframe
     and a sparse matrix of item/user/cnt """
 
     # read in triples of user/item/cnt from the input dataset
-    #data = pandas.read_csv(filename, sep="\t")
-
-    # Read in triples of user/item/cnt from the input training set:
-    # data_cols = ['user_id', 'item_id', 'cnt', 'daytime', 'weekday','isweekend', 'homework', 'cost', 'weather', 'country', 'city']
-
     data = pandas.read_csv(filename, sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-    print("original data")
-    print(data)
 
     # sum up the counts for a given user and a given item
     data = data.groupby(["user","item"], as_index = False).sum()
-    print("summed data")
-    print(data)
 
-    # map each item and user to a unique numeric value
-    # data['user'] = data['user'].astype("category")
-    # data['item'] = data['item'].astype("category")
-    #
-    # # create a sparse matrix of all the users/cnts
-    # cnts = coo_matrix((data['cnt'].astype(float),
-    #                    (data['item'].cat.codes.copy(),
-    #                     data['user'].cat.codes.copy())))
-
+    # create a sparse matrix of all the users/cnts
     cnts = coo_matrix((data['cnt'].astype(float),
                        (data['item'],
                         data['user'])))
 
-    print("conts")
-    print(cnts)
-
     return data, cnts
 
-
+# The function is to calculate recommendations and store the evaluation metrics into file
 def calculate_recommendations(train_filename, test_filename, output_filename, dir,
                               model_name="als",
                               factors=80, regularization=0.8,
@@ -87,7 +60,7 @@ def calculate_recommendations(train_filename, test_filename, output_filename, di
     df, cnts = read_data(dir+train_filename)
     logging.debug("read data file in %s", time.time() - start)
 
-    # generate a recommender model based off the input params
+    # generate a recommender model based on the input params
     if model_name == "als":
         if exact:
             model = AlternatingLeastSquares(factors=factors, regularization=regularization,
@@ -137,39 +110,19 @@ def calculate_recommendations(train_filename, test_filename, output_filename, di
 
 
     user_items = cnts.T.tocsr()
-    print(user_items)
+    # print(user_items)
     # recommend items for a user
     dict_recommended = {} # for computing MAP and MP
-    dict_recommended_df = {} # for computing NDCG
-    for user in users_test:
 
-        # if(user in users_train):
-        #     print(user)
-        #
-        #     recommendations = model.recommend(user, user_items)
-        #     print(recommendations)
-        # else:
-        #     continue
+    for user in users_test:
         if user not in users_train:
             continue
-        print(user)
+        # print(user)
         recommendations = model.recommend(user, user_items)
         df = pandas.DataFrame(recommendations, columns =["item","score"])
-        print(recommendations)
-        print(df["item"])
+        # print(recommendations)
+        # print(df["item"])
         dict_recommended[user] = list(df["item"])
-        dict_recommended_df[user] = df
-
-    # print(dict_actual)
-    # print(dict_recommended)
-    # print("MAP")
-    # print(MAP(dict_actual,dict_recommended))
-    # print("MP")
-    # print(MP(dict_actual, dict_recommended))
-    # print("NDCG")
-    # print(NDCG(dict_actual, dict_recommended))
-    # print("ERR")
-    # print(ERR(dict_actual, dict_recommended))
 
     ndcg = NDCG(dict_actual, dict_recommended)
 
@@ -183,21 +136,8 @@ def calculate_recommendations(train_filename, test_filename, output_filename, di
         o.write("NDCG\tERR\tMAP\tMP\n")
         o.write("%s\t%s\t%s\t%s\n" % (ndcg, err, map, mp))
 
-
     return (ndcg, err, map, mp)
 
-    # # write out similar items by popularity
-    # logging.debug("calculating top items")
-    # user_count = df.groupby('item').size()
-    # items = dict(enumerate(df['item'].cat.categories))
-    # to_generate = sorted(list(items), key=lambda x: -user_count[x])
-    #
-    # # write out as a TSV of itemid, otheritemid, score
-    # with open(output_filename, "w") as o:
-    #     for itemid in to_generate:
-    #         item = items[itemid]
-    #         for other, score in model.similar_items(itemid, 11):
-    #             o.write("%s\t%s\t%s\n" % (item, items[other], score))
 
 def plot_with_K():
     factors = range(20, 210, 20)
@@ -497,23 +437,5 @@ def e2_2(dir):
                               cg=False)
 # e2_2("e2-2/2/")
 
-########## test
 
-# data = pandas.read_csv("e2-4/train_abs_cold_item.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(data["user"])))
-#
-# test_data = pandas.read_csv("e2-4/test_abs_cold_item.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(test_data["user"])))
-#
-# data = pandas.read_csv("e2-4/train_abs_cold_user.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(data["user"])))
-#
-# test_data = pandas.read_csv("e2-4/test_abs_cold_user.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(test_data["user"])))
-#
-# data = pandas.read_csv("e2-4/train_warm.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(data["user"])))
-#
-# test_data = pandas.read_csv("e2-4/test_warm.csv", sep="\t", usecols=[0, 1, 2], names=['user', 'item', 'cnt'])
-# print(len(set(test_data["user"])))
 

@@ -3,7 +3,6 @@ import random
 import scipy.sparse as sp
 import numpy as np
 from lightfm import LightFM
-from lightfm.evaluation import precision_at_k
 from lightfm.evaluation import auc_score
 from measure import MAP
 from measure import MP
@@ -74,8 +73,6 @@ def fetch_frappe(original_data_path, train_data_path, test_data_path, item_meted
             'items': items,
             'users_test': set(test_raw["user"]),
             'test_data': test_raw}
-
-# def recommendations_lightFM(users_test, items):
 
 def recommendations_lightFM(original_data_path, train_data_path, test_data_path, item_metedata_path, d):
 
