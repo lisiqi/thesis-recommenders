@@ -78,9 +78,10 @@ The MATLAB implementation of GPFM is available at http://trungngv.github.io/gpfm
 
 To apply GPPW to the implicit feedback setting, we need to sample the negative/irrelevant feedback to each positive/relevant feedback and follow the input format required by the implementation of GPPW.
 
-Some comparisons are shown below.
-| This | is   |
-|------|------|
-|   a  | table|
+The input data required by different methods are summarized below.
+
+|      | iALS | LightFM | FM | GPPW|
+|------|------|---------|----|-----|
+|input data | implicit feedback| binary feedback + metadata| binary feedback + context| binary feedback + context|
 
 Check Chapter 3 of my thesis for detailed descussion and comparison of above four methods.  
