@@ -6,7 +6,7 @@ https://pure.tue.nl/ws/files/90854618/master_thesis_final_revised_SiqiLi.pdf
 In music light system, users can enjoy personalized light effect conducted by smart light while listening to the music. We can model this problem as a recommendation system since essentially the light effect is the item to recommend. However, the recommender for music light system is not traditional. Compared to traditional recommender system, it has two other main characteristics: 
 
 1. There is no explicit ratings, but we can infer user preference from the historical usage data as implicit feedback.
-2. We much consider necessary music features (e.g. tempo, key) as context information.
+2. We must consider necessary music features (e.g. tempo, key) as context information.
 
 Therefore, the music light system can be modeled as an implicit feedback based context-aware recommender system.
 
